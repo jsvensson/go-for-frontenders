@@ -18,7 +18,11 @@ func handleHello(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (h Handler) createTodo(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
+	// Limit request body to 100kB
+	b := http.MaxBytesReader(w, r.Body, 100_000)
+	defer b.Close()
+
+	body, err := io.ReadAll(b)
 	if err != nil {
 		log.Println("error reading body")
 		w.WriteHeader(http.StatusInternalServerError)
